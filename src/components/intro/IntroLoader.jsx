@@ -198,7 +198,7 @@ export default function IntroLoader({ onFinish }) {
             heroLogo.style.opacity = "1";
             onFinishRef.current();
           })
-          .to(rootRef.current, { opacity: 0, duration: 0.5 }, "+=0.05");
+          .to(root, { opacity: 0, duration: 0.5 }, "+=0.05");
       }
     }, rootRef);
 
