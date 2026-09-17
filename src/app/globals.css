@@ -1,0 +1,25 @@
+/* This one line brings in every Tailwind utility class (bg-, flex, text-, etc.) */
+@import "tailwindcss";
+
+/* Tailwind v4 config lives right here in CSS — no tailwind.config.js file.
+   Anything named "--color-x" below automatically becomes usable as
+   bg-x, text-x, border-x, etc. anywhere in your components. */
+@theme {
+  /* ---- our custom "goldenish black" palette ---- */
+  --color-panel: #15100a;        /* the dark panel behind the logo + button on the homepage */
+  --color-panel-deep: #0a0704;   /* darker still — used later for the page-transition overlay */
+  --color-gold: #c9a867;         /* main gold accent: borders, icons, the button shine */
+  --color-gold-light: #e8d9b5;   /* lighter gold: hover states, glow highlights */
+  --color-cream: #f3ead9;        /* warm off-white text, for use on the dark panel */
+
+  /* ---- fonts (the actual font FILES get loaded in layout.js, which sets --font-gambetta) ---- */
+  --font-display: var(--font-gambetta), serif;  /* headings, the wordmark area */
+  --font-sans: var(--font-gambetta), sans-serif;   /* buttons, nav, body copy */
+}
+
+/* plain base styles, apply everywhere */
+body {
+  background-color: #fff7ed; /* fallback color, close to your orange-100 */
+  font-family: var(--font-gambetta), sans-serif;
+  -webkit-font-smoothing: antialiased; /* slightly crisper text rendering */
+}
