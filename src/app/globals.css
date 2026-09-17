@@ -7,19 +7,177 @@
 @theme {
   /* ---- our custom "goldenish black" palette ---- */
   --color-panel: #15100a;        /* the dark panel behind the logo + button on the homepage */
-  --color-panel-deep: #0a0704;   /* darker still — used later for the page-transition overlay */
+  --color-panel-deep: #0a0704;   /* darker still — used for the page-transition overlay */
+  --color-panel-mid: #1f170d;    /* the lighter end of the panel's own gradient */
   --color-gold: #c9a867;         /* main gold accent: borders, icons, the button shine */
   --color-gold-light: #e8d9b5;   /* lighter gold: hover states, glow highlights */
+  --color-gold-deep: #aa8a4b;    /* the logo's own gold — used when something sits beside it */
   --color-cream: #f3ead9;        /* warm off-white text, for use on the dark panel */
 
   /* ---- fonts (the actual font FILES get loaded in layout.js, which sets --font-gambetta) ---- */
   --font-display: var(--font-gambetta), serif;  /* headings, the wordmark area */
   --font-sans: var(--font-gambetta), sans-serif;   /* buttons, nav, body copy */
+  --font-body: var(--font-gambetta), sans-serif;   /* the name the components actually use */
 }
 
 /* plain base styles, apply everywhere */
 body {
-  background-color: #fff7ed; /* fallback color, close to your orange-100 */
+  background-color: #0a0704; /* matches the panel, so no white flash before paint */
   font-family: var(--font-gambetta), sans-serif;
   -webkit-font-smoothing: antialiased; /* slightly crisper text rendering */
+}
+
+/* The blackish gradient shared by the intro loader's plate and the hero's
+   left column. They sit on top of each other during the handoff at the end
+   of the intro, so they have to be the same paint — hence one class rather
+   than the same stack of utilities written out twice. */
+.panel-gradient {
+  background:
+    radial-gradient(
+      120% 90% at 18% 10%,
+      rgba(201, 168, 103, 0.14) 0%,
+      transparent 55%
+    ),
+    linear-gradient(
+      155deg,
+      var(--color-panel-mid) 0%,
+      var(--color-panel) 42%,
+      var(--color-panel-deep) 100%
+    );
+}
+
+/* ============================================================
+   Shine button — a single band of light sweeps across on hover,
+   over a background that warms slightly.
+
+   Deliberately only `transform` and `opacity`: the earlier
+   version spun a masked conic gradient, and compositing a
+   masked + blurred gradient every frame is what made it stutter.
+   A translating band is handed straight to the GPU.
+   ============================================================ */
+.shine-btn {
+  position: relative;
+  overflow: hidden; /* clips the band to the pill */
+  transition:
+    border-color 0.5s ease,
+    background-color 0.5s ease,
+    color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+.shine-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -75%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(232, 217, 181, 0.16) 40%,
+    rgba(243, 234, 217, 0.34) 50%,
+    rgba(232, 217, 181, 0.16) 60%,
+    transparent 100%
+  );
+  transform: translateX(0) skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The band is absolutely positioned, the label isn't — without this the
+   sweep would pass over the top of the text instead of behind it. */
+.shine-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.shine-btn:hover,
+.shine-btn:focus-visible {
+  box-shadow: 0 0 22px -6px rgba(201, 168, 103, 0.55);
+}
+
+.shine-btn:hover::after,
+.shine-btn:focus-visible::after {
+  opacity: 1;
+  animation: shine-sweep 1.1s cubic-bezier(0.32, 0.12, 0.2, 1);
+}
+
+@keyframes shine-sweep {
+  from {
+    transform: translateX(0) skewX(-18deg);
+  }
+  to {
+    transform: translateX(420%) skewX(-18deg);
+  }
+}
+
+/* ============================================================
+   Hotspot pulse — the ring that breathes outward from a
+   hotspot. Two copies run on the same keyframes with one
+   delayed, so there's always a second ring on the way out.
+   ============================================================ */
+@keyframes hotspot-pulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.hotspot-ring {
+  animation: hotspot-pulse 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.hotspot-ring-delayed {
+  animation: hotspot-pulse 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation-delay: 1.3s;
+}
+
+/* The gold breathing of the hotspot core. The dark inner shadow is what
+   keeps the core readable when the panorama behind it is a bright window
+   or a white wall — gold alone disappears against those. */
+@keyframes hotspot-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(201, 168, 103, 0.5),
+      0 2px 10px 2px rgba(10, 7, 4, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 24px 7px rgba(201, 168, 103, 0.45),
+      0 2px 10px 2px rgba(10, 7, 4, 0.55);
+  }
+}
+
+.hotspot-core {
+  animation: hotspot-glow 2.6s ease-in-out infinite;
+}
+
+/* Marzipano writes its own positioning onto the element it's given, so the
+   hotspot wrapper must not fight it for layout — it only needs to stop
+   being a click target where it's transparent. */
+.hotspot-wrapper {
+  pointer-events: none;
+}
+
+.hotspot-wrapper > * {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-ring,
+  .hotspot-ring-delayed,
+  .hotspot-core,
+  .shine-btn:hover::after,
+  .shine-btn:focus-visible::after {
+    animation: none;
+  }
 }

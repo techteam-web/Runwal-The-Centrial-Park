@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { TransitionProvider } from "@/app/components/transition/TransitionProvider";
+import { TransitionProvider } from "@/components/transition/TransitionProvider";
 import "./globals.css";
 
 // Gambetta's files live right next to this file, in src/app/fonts/.
