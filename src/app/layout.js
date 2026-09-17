@@ -15,10 +15,49 @@ const gambetta = localFont({
   display: "swap",             // show a fallback font instantly, swap to Gambetta once it's loaded
 });
 
+const SITE_NAME = "Runwal The Central Park";
+const TITLE = "Runwal The Central Park | 360° Virtual Tour";
+const DESCRIPTION =
+  "Walk through Runwal The Central Park in full 360°. Explore all 17 spaces — living, bedrooms, kitchen and balconies — room by room, exactly as you would on a site visit.";
+
+// Open Graph and Twitter images have to be absolute URLs, so the crawlers on
+// WhatsApp, Slack, X and the rest can fetch them. metadataBase is what Next
+// resolves the relative paths below against; set NEXT_PUBLIC_SITE_URL to the
+// real domain at deploy time or link previews will point at localhost.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata = {
-  title: "Runwal The Central Park | Virtual Tour",
-  description:
-    "Step inside every room of Runwal The Central Park with an interactive 360° walkthrough.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "Runwal The Central Park",
+    "360 virtual tour",
+    "panoramic walkthrough",
+    "Mumbai real estate",
+    "show flat tour",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+};
+
+// themeColor belongs on the viewport export, not metadata — it's been
+// deprecated there since Next 14. This pins the colour the browser paints
+// around the page on mobile so it matches the panel instead of flashing white.
+export const viewport = {
+  themeColor: "#0a0704",
 };
 
 export default function RootLayout({ children }) {
