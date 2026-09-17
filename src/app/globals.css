@@ -46,6 +46,32 @@ body {
     );
 }
 
+/* Scrims over the panorama: darker along the top and bottom edges, clear
+   through the middle. The viewer's controls live on those two edges, and a
+   360 photo can swing a bright window or a white ceiling directly behind
+   them — without this the labels and buttons wash out as the view turns.
+   The closing radial just settles the corners. */
+.pano-scrim {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(10, 7, 4, 0.62) 0%,
+      rgba(10, 7, 4, 0.26) 11%,
+      transparent 26%
+    ),
+    linear-gradient(
+      to top,
+      rgba(10, 7, 4, 0.72) 0%,
+      rgba(10, 7, 4, 0.32) 13%,
+      transparent 30%
+    ),
+    radial-gradient(
+      125% 90% at 50% 50%,
+      transparent 58%,
+      rgba(10, 7, 4, 0.45) 100%
+    );
+}
+
 /* ============================================================
    Shine button — a single band of light sweeps across on hover,
    over a background that warms slightly.

@@ -132,8 +132,10 @@ export default function PanoViewer() {
         )
       )}
 
-      {/* A gentle vignette so the controls always have something to sit on. */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_85%_at_50%_50%,transparent_55%,rgba(10,7,4,0.55)_100%)]" />
+      {/* Sits above the stage but below the controls, so the buttons and
+          labels on the top and bottom edges always have something to read
+          against. */}
+      <div className="pano-scrim pointer-events-none absolute inset-0" />
 
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-5 sm:p-7">
         <div className="flex items-start justify-between gap-4">
