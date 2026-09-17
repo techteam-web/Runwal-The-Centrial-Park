@@ -37,26 +37,18 @@ export default function Hero({ revealed }) {
 
   return (
     <main className="relative flex min-h-screen flex-col lg:flex-row">
-      {/* The warm side. Sits behind everything and fills whatever the dark
-          column doesn't take. */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-100 via-amber-100 to-orange-200" />
+      {/* The palette, full bleed. Sits behind everything and fills whatever
+          the teal column doesn't take. */}
+      <div className="home-gradient absolute inset-0 -z-10" />
 
-      {/* A little depth on the warm side so it isn't a flat wash. */}
-      <div
-        className="absolute inset-0 -z-10 opacity-70"
-        style={{
-          background:
-            "radial-gradient(70% 55% at 78% 30%, rgba(255,255,255,0.75) 0%, transparent 60%), radial-gradient(60% 50% at 88% 88%, rgba(201,168,103,0.28) 0%, transparent 65%)",
-        }}
-      />
-
-      {/* ---- the dark column: 55% on desktop, full width on mobile ---- */}
+      {/* ---- the teal column: 55% on desktop, full width on mobile ---- */}
       <section
         data-hero-panel
         className="panel-gradient relative flex w-full flex-col justify-center px-8 py-20 sm:px-14 lg:w-[55%] lg:px-20"
       >
-        {/* A hairline of gold down the seam where the two halves meet. */}
-        <div className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent lg:block" />
+        {/* A hairline down the seam where the two halves meet, picking up the
+            mint from the middle of the gradient. */}
+        <div className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-mint/45 to-transparent lg:block" />
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -70,15 +62,15 @@ export default function Hero({ revealed }) {
         />
 
         <div ref={copyRef}>
-          <div className="mt-9 h-px w-16 bg-gold/50" />
+          <div className="mt-9 h-px w-16 bg-mint/60" />
 
-          <h1 className="mt-7 font-display text-4xl leading-[1.12] text-cream sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="mt-7 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[3.4rem]">
             Runwal
             <br />
             The Central Park
           </h1>
 
-          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-gold-light/70">
+          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75">
             Step inside every room in full 360°. Move between the living spaces,
             the bedrooms and the balconies exactly as you would on a site visit.
           </p>
@@ -87,7 +79,7 @@ export default function Hero({ revealed }) {
             <EnterButton />
           </div>
 
-          <p className="mt-8 font-body text-[11px] tracking-[0.3em] text-gold/45 uppercase">
+          <p className="mt-8 font-body text-[11px] tracking-[0.3em] text-mint/60 uppercase">
             17 Spaces · Interactive Walkthrough
           </p>
         </div>

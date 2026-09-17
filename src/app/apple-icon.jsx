@@ -7,12 +7,19 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-const mark = fs.readFileSync(
-  path.join(process.cwd(), "src", "app", "icon.svg")
-);
-const markSrc = `data:image/svg+xml;base64,${mark.toString("base64")}`;
+// Read inside the component rather than at module scope — the bundler can't
+// see that this file depends on icon.svg, so a cached module would keep
+// serving whatever the icon looked like the first time it was compiled.
+function markDataUri() {
+  const mark = fs.readFileSync(
+    path.join(process.cwd(), "src", "app", "icon.svg")
+  );
+  return `data:image/svg+xml;base64,${mark.toString("base64")}`;
+}
 
 export default function AppleIcon() {
+  const markSrc = markDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -22,7 +29,7 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a0704",
+          background: "#06382f",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

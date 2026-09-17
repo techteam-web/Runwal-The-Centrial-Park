@@ -9,12 +9,20 @@ export const alt = "Runwal The Central Park — 360° Virtual Tour";
 // Read off disk at build time and inlined as a data URI. Satori (what
 // ImageResponse renders with) won't fetch a relative path the way a browser
 // would — it needs the bytes.
-const mark = fs.readFileSync(
-  path.join(process.cwd(), "src", "app", "icon.svg")
-);
-const markSrc = `data:image/svg+xml;base64,${mark.toString("base64")}`;
+//
+// Read inside the component, not at module scope: the bundler has no idea
+// this file depends on icon.svg, so a module-level read gets baked into the
+// cached module and editing the icon leaves a stale mark in the card.
+function markDataUri() {
+  const mark = fs.readFileSync(
+    path.join(process.cwd(), "src", "app", "icon.svg")
+  );
+  return `data:image/svg+xml;base64,${mark.toString("base64")}`;
+}
 
 export default function Image() {
+  const markSrc = markDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -26,7 +34,7 @@ export default function Image() {
           justifyContent: "space-between",
           padding: "72px 80px",
           background:
-            "linear-gradient(135deg, #1f170d 0%, #15100a 45%, #0a0704 100%)",
+            "linear-gradient(135deg, #0c5e52 0%, #0a4b41 45%, #06382f 100%)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -35,14 +43,14 @@ export default function Image() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", width: 70, height: 2, background: "#c9a867" }} />
+          <div style={{ display: "flex", width: 70, height: 2, background: "#6ee7a8" }} />
           <div
             style={{
               display: "flex",
               marginTop: 30,
               fontSize: 74,
               lineHeight: 1.1,
-              color: "#f3ead9",
+              color: "#fdf6e6",
               letterSpacing: -1,
             }}
           >
@@ -53,7 +61,7 @@ export default function Image() {
               display: "flex",
               marginTop: 24,
               fontSize: 30,
-              color: "#e8d9b5",
+              color: "#f7e2b8",
               opacity: 0.75,
             }}
           >
@@ -66,7 +74,7 @@ export default function Image() {
             display: "flex",
             fontSize: 21,
             letterSpacing: 6,
-            color: "#c9a867",
+            color: "#6ee7a8",
           }}
         >
           INTERACTIVE 360° WALKTHROUGH

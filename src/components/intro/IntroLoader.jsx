@@ -260,7 +260,7 @@ export default function IntroLoader({ onFinish }) {
               width="99.6"
               height="129.6"
               rx="8.2"
-              stroke="var(--color-gold)"
+              stroke="var(--color-sand)"
               strokeWidth="1.1"
               style={{ strokeDasharray: 460, strokeDashoffset: 460 }}
             />
@@ -275,25 +275,25 @@ export default function IntroLoader({ onFinish }) {
           className="mt-12 flex flex-col items-center"
           style={{ opacity: 0 }}
         >
-          <div className="flex items-baseline gap-1 font-display text-cream">
+          <div className="flex items-baseline gap-1 font-display text-sand-light">
             <span
               ref={counterRef}
               className="text-3xl tabular-nums tracking-wider"
             >
               000
             </span>
-            <span className="text-sm text-gold">%</span>
+            <span className="text-sm text-mint">%</span>
           </div>
 
-          <div className="mt-4 h-px w-40 overflow-hidden bg-gold/20">
+          <div className="mt-4 h-px w-40 overflow-hidden bg-sand/20">
             <div
               ref={meterRef}
-              className="h-full w-full origin-left bg-gold"
+              className="h-full w-full origin-left bg-mint"
               style={{ transform: "scaleX(0)" }}
             />
           </div>
 
-          <p className="mt-5 font-body text-[11px] tracking-[0.35em] text-gold-light/60 uppercase">
+          <p className="mt-5 font-body text-[11px] tracking-[0.35em] text-sand/60 uppercase">
             The Central Park
           </p>
         </div>

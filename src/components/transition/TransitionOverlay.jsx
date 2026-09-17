@@ -28,7 +28,7 @@ function TransitionOverlay({ ref, markRef }) {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/runwalLogo.svg" alt="" width={62} height={80} />
-        <div className="mt-5 h-px w-12 bg-gold/60" />
+        <div className="mt-5 h-px w-12 bg-mint/60" />
       </div>
     </div>
   );

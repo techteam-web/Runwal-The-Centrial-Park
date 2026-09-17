@@ -10,7 +10,7 @@ export default function EnterButton() {
   return (
     <button
       onClick={() => coverAndNavigate("/tour")}
-      className="shine-btn group inline-flex items-center gap-4 rounded-full border border-gold/30 bg-panel-deep/60 px-9 py-4 font-body text-sm tracking-[0.18em] text-cream uppercase hover:border-gold/70 hover:bg-panel/80 hover:text-gold-light focus-visible:outline-none"
+      className="shine-btn group inline-flex items-center gap-4 rounded-full border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none"
     >
       <span>Enter The Virtual Tour</span>
 
