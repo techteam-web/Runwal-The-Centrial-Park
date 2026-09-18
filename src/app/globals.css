@@ -268,3 +268,15 @@ body {
     animation: none;
   }
 }
+
+/* Goes with NoContextMenu. iOS doesn't fire a contextmenu event — its
+   long-press "Save Image" callout is suppressed with this property instead,
+   and the drag rules stop an image being dragged straight out to the
+   desktop. Selection is only disabled on images; killing it on text would
+   make the page feel broken for no benefit. */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

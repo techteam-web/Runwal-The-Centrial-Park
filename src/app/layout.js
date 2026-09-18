@@ -1,5 +1,7 @@
 import localFont from "next/font/local";
 import { TransitionProvider } from "@/components/transition/TransitionProvider";
+import NoContextMenu from "@/components/site/NoContextMenu";
+import Watermark from "@/components/site/Watermark";
 import "./globals.css";
 
 // Gambetta's files live right next to this file, in src/app/fonts/.
@@ -64,7 +66,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={gambetta.variable}>
+        <NoContextMenu />
         <TransitionProvider>{children}</TransitionProvider>
+        <Watermark />
       </body>
     </html>
   );

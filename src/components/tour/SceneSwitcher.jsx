@@ -18,7 +18,7 @@ export default function SceneSwitcher({ currentId, onSelect }) {
   }, [currentId]);
 
   return (
-    <div className="pointer-events-auto mx-auto w-full max-w-4xl">
+    <div className="pointer-events-auto mx-auto w-full max-w-4xl pr-24 sm:pr-28 lg:pr-0">
       <div
         ref={railRef}
         className="flex gap-2 overflow-x-auto rounded-full border border-gold/20 bg-panel-deep/65 p-2 backdrop-blur-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
