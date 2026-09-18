@@ -84,7 +84,7 @@ export const tourData = {   // <-- was: var APP_DATA =
     },
     {
       "id": "1-living-cam_1",
-      "name": "living cam_1",
+      "name": "living cam 1",
       "levels": [
         {
           "tileSize": 256,
@@ -474,7 +474,7 @@ export const tourData = {   // <-- was: var APP_DATA =
     },
     {
       "id": "10-uility",
-      "name": "uility",
+      "name": "utility",
       "levels": [
         {
           "tileSize": 256,

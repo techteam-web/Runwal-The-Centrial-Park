@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { tourData } from "@/lib/tourData";
+import { formatSceneName } from "@/lib/marzipano-helpers";
 
 // Bottom-centre scene nav. 17 scenes never fit on a phone, so the rail
 // scrolls horizontally and keeps the active chip dragged into view.
@@ -37,7 +38,7 @@ export default function SceneSwitcher({ currentId, onSelect }) {
                   : "text-gold-light/60 hover:bg-gold/10 hover:text-gold-light"
               }`}
             >
-              {scene.name}
+              {formatSceneName(scene.name)}
             </button>
           );
         })}

@@ -13,8 +13,23 @@ export function findScene(id) {
   return tourData.scenes.find((scene) => scene.id === id);
 }
 
+// The names come straight out of the Marzipano export, which carries the
+// original file naming with it — underscores, the odd doubled space, one
+// camelCase. Tidied here for display rather than edited into tourData.js, so
+// re-exporting the tour doesn't quietly undo it.
+//
+// Only `name` is touched. `id` has to keep matching the tile folders on disk.
+export function formatSceneName(name) {
+  return name
+    .replace(/_/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function sceneName(id) {
-  return findScene(id)?.name ?? id;
+  const scene = findScene(id);
+  return scene ? formatSceneName(scene.name) : id;
 }
 
 // Builds every scene up front. Marzipano only fetches tiles for whichever
