@@ -69,6 +69,44 @@ body {
   );
 }
 
+/* The hero photograph — desktop and up only.
+
+   Deliberately a CSS background inside a media query rather than an <img>:
+   an <img> hidden with display:none is still downloaded, and phones never
+   show this at all. Below 1024px this rule simply doesn't match, so the file
+   is never fetched and small devices pay nothing for it.
+
+   image-set lets the browser pick by display density instead of handing the
+   same file to a 1x laptop and a retina panel. The prefixed form covers older
+   Safari and Chrome, the unprefixed one everything current — between them
+   there's no live browser left needing a plain url() fallback, and the
+   minifier strips one anyway since the later declaration always wins. */
+@media (min-width: 1024px) {
+  .hero-photo {
+    background-image: -webkit-image-set(
+      url("/images/building-1600.webp") 1x,
+      url("/images/building-2560.webp") 2x
+    );
+    background-image: image-set(
+      url("/images/building-1600.webp") 1x,
+      url("/images/building-2560.webp") 2x
+    );
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+
+/* image-set chooses by pixel density, not viewport width, so a wide but
+   standard-density monitor would stretch the 1600px file across 2560px of
+   screen. Hand those the larger one directly. */
+@media (min-width: 1700px) {
+  .hero-photo {
+    background-image: -webkit-image-set(url("/images/building-2560.webp") 1x);
+    background-image: image-set(url("/images/building-2560.webp") 1x);
+  }
+}
+
 /* Scrims over the panorama: darker along the top and bottom edges, clear
    through the middle. The viewer's controls live on those two edges, and a
    360 photo can swing a bright window or a white ceiling directly behind

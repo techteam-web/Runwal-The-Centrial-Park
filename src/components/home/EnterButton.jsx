@@ -4,13 +4,16 @@ import { useTransition } from "@/components/transition/TransitionProvider";
 
 // The sweep itself lives in globals.css under .shine-btn — a pseudo-element
 // band and a keyframe, neither of which a utility class can express.
+//
+// Type and padding tighten from lg up: at that size the button sits in a 26%
+// column, and the roomier phone sizing would overflow it.
 export default function EnterButton() {
   const { coverAndNavigate } = useTransition();
 
   return (
     <button
       onClick={() => coverAndNavigate("/tour")}
-      className="shine-btn group inline-flex items-center gap-4 rounded-full border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none"
+      className="shine-btn group inline-flex items-center gap-4 rounded-full border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none lg:gap-3 lg:px-6 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
     >
       <span>Enter The Virtual Tour</span>
 

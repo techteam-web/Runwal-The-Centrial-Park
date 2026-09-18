@@ -37,17 +37,33 @@ export default function Hero({ revealed }) {
 
   return (
     <main className="relative flex min-h-screen flex-col lg:flex-row">
-      {/* The palette, full bleed. Sits behind everything and fills whatever
-          the teal column doesn't take. */}
-      <div className="home-gradient absolute inset-0 -z-10" />
+      {/* Phones and tablets: no photograph at all, just the palette. The
+          panel below covers this once it fills the screen — this is here so
+          a short viewport never shows a bare strip underneath. */}
+      <div className="home-gradient absolute inset-0 -z-10 lg:hidden" />
 
-      {/* ---- the teal column: 55% on desktop, full width on mobile ---- */}
+      {/* Desktop: the photograph. The background-image itself lives behind a
+          min-width media query, so this file is never fetched on the sizes
+          that hide it. */}
+      <div className="hero-photo absolute inset-0 -z-10 hidden lg:block" />
+
+      {/* Carries the panel's teal a little way across the photo so the column
+          doesn't end in a hard vertical cut against the sky. */}
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
+        style={{
+          background:
+            "linear-gradient(to right, rgba(6,56,47,0.92) 0%, rgba(6,56,47,0.45) 10%, rgba(6,56,47,0.12) 24%, transparent 42%)",
+        }}
+      />
+
+      {/* ---- the teal column: a narrow 26% on desktop, the whole screen on
+           phones. flex-1 is what makes it fill a short mobile viewport. ---- */}
       <section
         data-hero-panel
-        className="panel-gradient relative flex w-full flex-col justify-center px-8 py-20 sm:px-14 lg:w-[55%] lg:px-20"
+        className="panel-gradient relative flex w-full flex-1 flex-col justify-center px-8 py-20 sm:px-14 lg:w-[26%] lg:min-w-90 lg:flex-none lg:px-9 xl:px-12"
       >
-        {/* A hairline down the seam where the two halves meet, picking up the
-            mint from the middle of the gradient. */}
+        {/* A hairline down the seam where the column meets the photo. */}
         <div className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-mint/45 to-transparent lg:block" />
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -56,31 +72,37 @@ export default function Hero({ revealed }) {
           data-hero-logo
           src="/runwalLogo.svg"
           alt="Runwal The Central Park"
-          width={84}
-          height={109}
+          width={72}
+          height={93}
           className="opacity-0"
         />
 
         <div ref={copyRef}>
-          <div className="mt-9 h-px w-16 bg-mint/60" />
+          <div className="mt-8 h-px w-14 bg-mint/60" />
 
-          <h1 className="mt-7 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="mt-6 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[2.6rem] xl:text-[3rem]">
             Runwal
             <br />
             The Central Park
           </h1>
 
-          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75">
+          {/* The long copy would crowd a 26% column, so it's for phones and
+              tablets only — the desktop gets the photograph instead. */}
+          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75 lg:hidden">
             Step inside every room in full 360°. Move between the living spaces,
             the bedrooms and the balconies exactly as you would on a site visit.
           </p>
 
-          <div className="mt-11">
+          <p className="mt-5 hidden font-body text-sm leading-relaxed text-sand/75 lg:block">
+            Step inside every room in full 360°.
+          </p>
+
+          <div className="mt-9">
             <EnterButton />
           </div>
 
-          <p className="mt-8 font-body text-[11px] tracking-[0.3em] text-mint/60 uppercase">
-            17 Spaces · Interactive Walkthrough
+          <p className="mt-8 font-body text-[10px] tracking-[0.28em] text-mint/60 uppercase">
+            17 Spaces · 360° Walkthrough
           </p>
         </div>
       </section>
