@@ -5,11 +5,13 @@ import { useTransition } from "@/components/transition/TransitionProvider";
 // The sweep itself lives in globals.css under .shine-btn — a pseudo-element
 // band and a keyframe, neither of which a utility class can express.
 //
-// Type and padding tighten from lg up: at that size the button sits in a 26%
-// column, and the roomier phone sizing would overflow it.
+// Sized to sit in a pair, side by side. The tightest spots are a 320px phone
+// and the 26% desktop column at 1280px, where each button gets ~125px — so
+// the padding is lean there, and only opens up on a tablet, where the panel
+// is the whole screen.
 //
 // justify-between only shows when a button is stretched wider than its label —
-// in a stack of them — and keeps every arrow on the same right-hand edge.
+// the shorter one in a pair is — and keeps both arrows on the right edge.
 export default function EnterButton({ href, children }) {
   const { coverAndNavigate } = useTransition();
 
@@ -17,7 +19,7 @@ export default function EnterButton({ href, children }) {
     <button
       type="button"
       onClick={() => coverAndNavigate(href)}
-      className="shine-btn group inline-flex items-center justify-between gap-4 rounded-none border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none lg:gap-3 lg:px-6 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
+      className="shine-btn group inline-flex items-center justify-between gap-3 rounded-none border border-sand/35 bg-forest-deep/50 px-4 py-4 font-body text-xs tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none sm:gap-4 sm:px-7 sm:text-sm lg:gap-2.5 lg:px-4 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
     >
       <span>{children}</span>
 

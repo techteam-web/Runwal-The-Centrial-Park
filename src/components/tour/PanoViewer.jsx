@@ -23,7 +23,7 @@ export default function PanoViewer({ tour }) {
   // mid-zoom is dropped rather than cutting the first one off halfway.
   const zoomRef = useRef(null);
 
-  const [currentId, setCurrentId] = useState(tour.data.scenes[0].id);
+  const [currentId, setCurrentId] = useState(tour.firstScene);
   const [autorotating, setAutorotating] = useState(
     tour.data.settings.autorotateEnabled
   );
@@ -136,7 +136,7 @@ export default function PanoViewer({ tour }) {
         });
       };
 
-      switchSceneRef.current(tour.data.scenes[0].id, { instant: true });
+      switchSceneRef.current(tour.firstScene, { instant: true });
 
       if (autorotatingRef.current) {
         viewer.startMovement(autorotateRef.current);
