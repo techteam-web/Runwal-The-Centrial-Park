@@ -186,7 +186,7 @@ body {
    ============================================================ */
 .shine-btn {
   position: relative;
-  overflow: hidden; /* clips the band to the pill */
+  overflow: hidden; /* clips the band to the button */
   transition:
     border-color 0.5s ease,
     background-color 0.5s ease,

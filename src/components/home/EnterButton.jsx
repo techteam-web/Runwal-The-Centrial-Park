@@ -13,7 +13,7 @@ export default function EnterButton() {
   return (
     <button
       onClick={() => coverAndNavigate("/tour")}
-      className="shine-btn group inline-flex items-center gap-4 rounded-full border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none lg:gap-3 lg:px-6 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
+      className="shine-btn group inline-flex items-center gap-4 rounded-none border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none lg:gap-3 lg:px-6 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
     >
       <span>View 4.5 BHK</span>
 
