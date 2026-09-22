@@ -577,3 +577,149 @@ img {
     animation: none;
   }
 }
+
+/* ============================================================
+   Custom cursor — a dot that sits exactly on the pointer and a
+   ring that trails it (see components/site/CustomCursor.jsx).
+
+   The native cursor is only hidden once .has-custom-cursor is
+   on <html>, which the component adds only for a real mouse —
+   touch screens never lose anything.
+
+   Gold-light with a dark hairline either side, the same trick
+   the hotspots use: pale gold alone vanishes on a sunlit wall,
+   and a dark edge alone vanishes on the teal panel.
+   ============================================================ */
+.has-custom-cursor,
+.has-custom-cursor * {
+  /* !important because Marzipano writes its drag cursor inline */
+  cursor: none !important;
+}
+
+.cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* over the page transition (z-90) and the intro (z-70) */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+/* Moved by the component every frame; nothing else touches it. */
+.cursor-follow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-gold-light);
+  box-shadow: 0 0 0 1px rgba(10, 7, 4, 0.45);
+  transition:
+    transform 250ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(232, 217, 181, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(10, 7, 4, 0.2),
+    inset 0 0 0 1px rgba(10, 7, 4, 0.2);
+  transition:
+    width 380ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 380ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 250ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 380ms ease,
+    border-color 380ms ease;
+}
+
+/* Over anything clickable the ring opens out and warms, and the dot steps
+   aside so it isn't sitting on the label. */
+.cursor[data-state="link"] .cursor-ring {
+  width: 58px;
+  height: 58px;
+  border-color: var(--color-gold);
+  background-color: rgba(201, 168, 103, 0.14);
+}
+
+.cursor[data-state="link"] .cursor-dot {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+/* Over the panorama the whole surface is "drag to look around", so the ring
+   carries an arrow either side. */
+.cursor[data-state="drag"] .cursor-ring {
+  width: 44px;
+  height: 44px;
+}
+
+.cursor-arrow {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 12px;
+  margin-top: -6px;
+  color: var(--color-gold-light);
+  filter: drop-shadow(0 0 1px rgba(10, 7, 4, 0.75));
+  opacity: 0;
+  transition:
+    opacity 250ms ease,
+    transform 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.cursor-arrow-left {
+  left: -16px;
+  transform: translateX(-5px);
+}
+
+.cursor-arrow-right {
+  right: -16px;
+  transform: translateX(5px);
+}
+
+.cursor[data-state="drag"] .cursor-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Pressed: the ring tightens around the dot — and mid-drag the arrows come
+   in with it, so a drag feels like taking hold of the view. */
+.cursor[data-pressed="true"] .cursor-ring {
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
+.cursor[data-pressed="true"] .cursor-dot {
+  transform: translate(-50%, -50%) scale(1.35);
+}
+
+.cursor[data-state="link"][data-pressed="true"] .cursor-dot {
+  transform: translate(-50%, -50%) scale(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor,
+  .cursor-dot,
+  .cursor-ring,
+  .cursor-arrow {
+    transition: none;
+  }
+}

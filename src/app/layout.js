@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import { TransitionProvider } from "@/components/transition/TransitionProvider";
 import NoContextMenu from "@/components/site/NoContextMenu";
+import CustomCursor from "@/components/site/CustomCursor";
 import Watermark from "@/components/site/Watermark";
 import "./globals.css";
 
@@ -69,6 +70,9 @@ export default function RootLayout({ children }) {
         <NoContextMenu />
         <TransitionProvider>{children}</TransitionProvider>
         <Watermark />
+        {/* Outside the transition provider, so it carries on across a route
+            change instead of being torn down and rebuilt mid-move. */}
+        <CustomCursor />
       </body>
     </html>
   );

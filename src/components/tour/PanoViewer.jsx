@@ -180,8 +180,9 @@ export default function PanoViewer() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-panel-deep">
-      {/* Marzipano owns everything inside this node. */}
-      <div ref={stageRef} className="absolute inset-0" />
+      {/* Marzipano owns everything inside this node. `data-cursor` gives the
+          custom cursor its drag arrows over the panorama. */}
+      <div ref={stageRef} data-cursor="drag" className="absolute inset-0" />
 
       {/* Over the stage and its hotspots, under the controls. Opacity is set
           inline rather than with a class so GSAP's writes simply replace it. */}
