@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { minimapData } from "@/lib/minimapData";
 import { sceneName } from "@/lib/marzipano-helpers";
 
 // The radar is drawn in its own -50..50 box so the cone can be described in
@@ -17,11 +16,12 @@ const RAD_TO_DEG = 180 / Math.PI;
 // than the other way round: the browser rasterises the plan once, at the
 // larger size, so zooming in doesn't hand back a blurry upscale of a 260px
 // bitmap.
-export default function MiniMap({ viewer, currentId, onSelect }) {
+export default function MiniMap({ tour, viewer, currentId, onSelect }) {
   const coneRef = useRef(null);
   const fillRef = useRef(null);
 
-  const active = minimapData.points.find((point) => point.id === currentId);
+  const { minimap } = tour;
+  const active = minimap.points.find((point) => point.id === currentId);
 
   // ---- keep the cone pointing wherever the visitor is looking ----
   useEffect(() => {
@@ -89,17 +89,17 @@ export default function MiniMap({ viewer, currentId, onSelect }) {
   return (
     <div
       className="minimap pointer-events-auto hidden md:block"
-      style={{ "--mm-aspect": minimapData.aspect }}
+      style={{ "--mm-aspect": minimap.aspect }}
     >
       <div className="minimap-frame">
         <div className="minimap-viewport">
-          <div className="minimap-plane" style={minimapData.plane}>
+          <div className="minimap-plane" style={minimap.plane}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={minimapData.image}
+              src={minimap.image}
               alt=""
-              width={1491}
-              height={1055}
+              width={minimap.width}
+              height={minimap.height}
               draggable={false}
               className="minimap-plan"
             />
@@ -146,9 +146,9 @@ export default function MiniMap({ viewer, currentId, onSelect }) {
             ) : null}
 
             <div className="minimap-points">
-              {minimapData.points.map((point) => {
+              {minimap.points.map((point) => {
                 const isActive = point.id === currentId;
-                const label = sceneName(point.id);
+                const label = sceneName(tour, point.id);
                 return (
                   <button
                     key={point.id}
@@ -178,7 +178,7 @@ export default function MiniMap({ viewer, currentId, onSelect }) {
         <p className="minimap-caption">
           <span className="minimap-caption-label">
             <span className="minimap-caption-dot" />
-            {minimapData.title}
+            {minimap.title}
           </span>
         </p>
       </div>

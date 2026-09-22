@@ -97,8 +97,13 @@ export default function Hero({ revealed }) {
             Step inside every room in full 360°.
           </p>
 
-          <div className="mt-9">
-            <EnterButton />
+          {/* One way in per unit. Stacked in the narrow desktop column, where
+              side by side they'd overflow it, and side by side on a tablet,
+              where the panel is the whole screen. w-fit keeps a stack only as
+              wide as its widest button, which the other stretches to. */}
+          <div className="mt-9 flex w-fit flex-col gap-3 sm:flex-row lg:flex-col">
+            <EnterButton href="/tour/3-bhk">View 3 BHK</EnterButton>
+            <EnterButton href="/tour/4-5-bhk">View 4.5 BHK</EnterButton>
           </div>
 
           <p className="mt-8 font-body text-[10px] tracking-[0.28em] text-mint/60 uppercase pointer-events-none">

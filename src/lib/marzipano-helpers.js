@@ -2,45 +2,46 @@
 // importing it. Marzipano touches `window` and `document` the moment it's
 // loaded, so it can only ever be imported inside a browser-side effect —
 // a top-level import in this file would drag it into the server bundle.
+//
+// `tour` is one entry from lib/tours.js.
 
-import { tourData } from "./tourData";
+// Matches the export on disk: <tiles>/<id>/<level>/<face>/<y>/<x>.jpg
+const tileUrl = (tour, id) => `${tour.tiles}/${id}/{z}/{f}/{y}/{x}.jpg`;
+const previewUrl = (tour, id) => `${tour.tiles}/${id}/preview.jpg`;
 
-// Matches the export on disk: public/tour/tiles/<id>/<level>/<face>/<y>/<x>.jpg
-const TILE_URL = "/tour/tiles/{id}/{z}/{f}/{y}/{x}.jpg";
-const PREVIEW_URL = "/tour/tiles/{id}/preview.jpg";
-
-export function findScene(id) {
-  return tourData.scenes.find((scene) => scene.id === id);
+export function findScene(tour, id) {
+  return tour.data.scenes.find((scene) => scene.id === id);
 }
 
 // The names come straight out of the Marzipano export, which carries the
-// original file naming with it — underscores, the odd doubled space, one
-// camelCase. Tidied here for display rather than edited into tourData.js, so
-// re-exporting the tour doesn't quietly undo it.
+// original file naming with it — underscores, the odd doubled space, some
+// camelCase, a digit run into the word before it ("View1"). Tidied here for
+// display rather than edited into the tour data, so re-exporting a tour
+// doesn't quietly undo it.
 //
 // Only `name` is touched. `id` has to keep matching the tile folders on disk.
 export function formatSceneName(name) {
   return name
     .replace(/_/g, " ")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([a-zA-Z])(\d)/g, "$1 $2")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-export function sceneName(id) {
-  const scene = findScene(id);
+export function sceneName(tour, id) {
+  const scene = findScene(tour, id);
   return scene ? formatSceneName(scene.name) : id;
 }
 
 // Builds every scene up front. Marzipano only fetches tiles for whichever
 // scene is actually being displayed, so this is cheap — it's just geometry
 // and URL templates until something is shown.
-export function createScenes(Marzipano, viewer) {
-  return tourData.scenes.map((data) => {
-    const source = Marzipano.ImageUrlSource.fromString(
-      TILE_URL.replace("{id}", data.id),
-      { cubeMapPreviewUrl: PREVIEW_URL.replace("{id}", data.id) }
-    );
+export function createScenes(Marzipano, viewer, tour) {
+  return tour.data.scenes.map((data) => {
+    const source = Marzipano.ImageUrlSource.fromString(tileUrl(tour, data.id), {
+      cubeMapPreviewUrl: previewUrl(tour, data.id),
+    });
 
     const geometry = new Marzipano.CubeGeometry(data.levels);
 

@@ -1,13 +1,8 @@
-"use client";
+import { redirect } from "next/navigation";
+import { DEFAULT_TOUR } from "@/lib/tours";
 
-import dynamic from "next/dynamic";
-
-// Marzipano is browser-only, so the viewer is never prerendered — `ssr: false`
-// keeps it out of the server render entirely.
-const PanoViewer = dynamic(() => import("@/components/tour/PanoViewer"), {
-  ssr: false,
-});
-
-export default function TourPage() {
-  return <PanoViewer />;
+// There's a tour per unit now, under /tour/<unit>. The old single-tour
+// address still lands somewhere rather than on a 404.
+export default function TourIndex() {
+  redirect(`/tour/${DEFAULT_TOUR}`);
 }

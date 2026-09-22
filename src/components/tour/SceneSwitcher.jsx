@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { tourData } from "@/lib/tourData";
 import { formatSceneName } from "@/lib/marzipano-helpers";
 
 // Bottom-centre scene nav. 17 scenes never fit on a phone, so the rail
 // scrolls horizontally and keeps the active chip dragged into view.
-export default function SceneSwitcher({ currentId, onSelect }) {
+export default function SceneSwitcher({ tour, currentId, onSelect }) {
   const railRef = useRef(null);
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export default function SceneSwitcher({ currentId, onSelect }) {
         ref={railRef}
         className="flex gap-2 overflow-x-auto rounded-full border border-gold/20 bg-panel-deep/65 p-2 backdrop-blur-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {tourData.scenes.map((scene) => {
+        {tour.data.scenes.map((scene) => {
           const active = scene.id === currentId;
           return (
             <button

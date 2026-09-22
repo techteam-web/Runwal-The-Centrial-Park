@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { tourData } from "@/lib/tourData";
 import { createAutorotate, createScenes, sceneName } from "@/lib/marzipano-helpers";
 import { zoomToScene } from "@/lib/zoomTransition";
 import CustomHotspot from "./CustomHotspot";
@@ -11,9 +10,9 @@ import MiniMap from "./MiniMap";
 import AutorotateToggle from "./AutorotateToggle";
 import CloseButton from "./CloseButton";
 
-const FIRST_SCENE = tourData.scenes[0].id;
-
-export default function PanoViewer() {
+// `tour` is one entry from lib/tours.js. The page keys this component by the
+// tour's slug, so a tour never changes under a viewer that's already built.
+export default function PanoViewer({ tour }) {
   const stageRef = useRef(null);
   const viewerRef = useRef(null);
   const scenesRef = useRef(null);
@@ -24,9 +23,9 @@ export default function PanoViewer() {
   // mid-zoom is dropped rather than cutting the first one off halfway.
   const zoomRef = useRef(null);
 
-  const [currentId, setCurrentId] = useState(FIRST_SCENE);
+  const [currentId, setCurrentId] = useState(tour.data.scenes[0].id);
   const [autorotating, setAutorotating] = useState(
-    tourData.settings.autorotateEnabled
+    tour.data.settings.autorotateEnabled
   );
   const [ready, setReady] = useState(false);
   // The viewer itself, in state as well as in a ref: the mini map's radar
@@ -55,12 +54,12 @@ export default function PanoViewer() {
       const Marzipano = mod.default ?? mod;
 
       viewer = new Marzipano.Viewer(stageRef.current, {
-        controls: { mouseViewMode: tourData.settings.mouseViewMode },
+        controls: { mouseViewMode: tour.data.settings.mouseViewMode },
       });
       viewerRef.current = viewer;
       setViewer(viewer);
 
-      const built = createScenes(Marzipano, viewer);
+      const built = createScenes(Marzipano, viewer, tour);
       scenesRef.current = built;
       autorotateRef.current = createAutorotate(Marzipano);
 
@@ -137,7 +136,7 @@ export default function PanoViewer() {
         });
       };
 
-      switchSceneRef.current(FIRST_SCENE, { instant: true });
+      switchSceneRef.current(tour.data.scenes[0].id, { instant: true });
 
       if (autorotatingRef.current) {
         viewer.startMovement(autorotateRef.current);
@@ -158,7 +157,7 @@ export default function PanoViewer() {
       viewerRef.current = null;
       setViewer(null);
     };
-  }, []);
+  }, [tour]);
 
   // ---- autorotate, driven by the toggle ----
   useEffect(() => {
@@ -197,7 +196,7 @@ export default function PanoViewer() {
       {hotspotSlots.map((slot) =>
         createPortal(
           <CustomHotspot
-            label={sceneName(slot.target)}
+            label={sceneName(tour, slot.target)}
             onSelect={() => goToScene(slot.target, slot.focus)}
           />,
           slot.element,
@@ -214,10 +213,10 @@ export default function PanoViewer() {
         <div className="flex items-start justify-between gap-4">
           <div className="pointer-events-auto rounded-full border border-gold/20 bg-panel-deep/60 px-4 py-2 backdrop-blur-md">
             <p className="font-body text-[10px] tracking-[0.3em] text-gold/60 uppercase">
-              Now viewing
+              {tour.label} · Now viewing
             </p>
             <p className="font-display text-sm text-cream capitalize">
-              {sceneName(currentId)}
+              {sceneName(tour, currentId)}
             </p>
           </div>
 
@@ -233,10 +232,15 @@ export default function PanoViewer() {
         {/* One row along the bottom edge: the plan holds the left corner and
             the scene rail centres itself in whatever width is left. */}
         <div className="flex items-end gap-4 sm:gap-5">
-          <MiniMap viewer={viewer} currentId={currentId} onSelect={goToScene} />
+          <MiniMap
+            tour={tour}
+            viewer={viewer}
+            currentId={currentId}
+            onSelect={goToScene}
+          />
 
           <div className="min-w-0 flex-1 lg:pr-36">
-            <SceneSwitcher currentId={currentId} onSelect={goToScene} />
+            <SceneSwitcher tour={tour} currentId={currentId} onSelect={goToScene} />
           </div>
         </div>
       </div>
