@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { tourData } from "@/lib/tourData";
-import { createAutorotate, createScenes, sceneName } from "@/lib/marzipano-helpers";
+import {
+  carryYaw,
+  createAutorotate,
+  createScenes,
+  linkYaw,
+  sceneName,
+} from "@/lib/marzipano-helpers";
+import { walkToScene } from "@/lib/walkTransition";
 import CustomHotspot from "./CustomHotspot";
 import SceneSwitcher from "./SceneSwitcher";
 import MiniMap from "./MiniMap";
@@ -17,6 +24,12 @@ export default function PanoViewer() {
   const viewerRef = useRef(null);
   const scenesRef = useRef(null);
   const autorotateRef = useRef(null);
+  // The two overlays that ride along with a walk between scenes.
+  const walkBlurRef = useRef(null);
+  const walkShadeRef = useRef(null);
+  // The walk in progress, if any. Doubles as the lock: a second request made
+  // mid-walk is dropped rather than wrenching the view off in a new direction.
+  const walkRef = useRef(null);
 
   const [currentId, setCurrentId] = useState(FIRST_SCENE);
   const [autorotating, setAutorotating] = useState(
@@ -58,18 +71,15 @@ export default function PanoViewer() {
       scenesRef.current = built;
       autorotateRef.current = createAutorotate(Marzipano);
 
-      // Switching is defined in here so it closes over the built scenes.
-      switchSceneRef.current = (id, { instant = false } = {}) => {
-        const next = built.find((entry) => entry.data.id === id);
-        if (!next) return;
+      let current = null;
 
-        next.view.setParameters(next.data.initialViewParameters);
-        next.scene.switchTo({ transitionDuration: instant ? 0 : 900 });
-        setCurrentId(id);
+      // Rebuild the hotspot layer for whatever scene we just landed on.
+      // Clearing first matters on a revisit: scenes keep their hotspots, so
+      // coming back to one would otherwise stack a second set on top.
+      const land = (next) => {
+        current = next;
+        setCurrentId(next.data.id);
 
-        // Rebuild the hotspot layer for whatever scene we just landed on.
-        // Clearing first matters on a revisit: scenes keep their hotspots, so
-        // coming back to one would otherwise stack a second set on top.
         const container = next.scene.hotspotContainer();
         container.listHotspots().forEach((spot) => container.destroyHotspot(spot));
 
@@ -80,9 +90,65 @@ export default function PanoViewer() {
             yaw: spot.yaw,
             pitch: spot.pitch,
           });
-          return { element, target: spot.target, key: `${id}-${spot.target}-${spot.yaw}` };
+          return {
+            element,
+            target: spot.target,
+            yaw: spot.yaw,
+            key: `${next.data.id}-${spot.target}-${spot.yaw}`,
+          };
         });
         setHotspotSlots(slots);
+      };
+
+      // Switching is defined in here so it closes over the built scenes.
+      // `lookYaw` is the doorway to walk through — a clicked hotspot passes
+      // its own; the scene rail and the mini map leave it to be looked up.
+      switchSceneRef.current = (id, { instant = false, lookYaw } = {}) => {
+        const next = built.find((entry) => entry.data.id === id);
+        if (!next || next === current || walkRef.current) return;
+
+        const still =
+          instant ||
+          !current ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (still) {
+          next.view.setParameters({ ...next.data.initialViewParameters, roll: 0 });
+          next.scene.switchTo({ transitionDuration: instant ? 0 : 900 });
+          // A walk leaves the container it walked away from faded out.
+          next.scene.hotspotContainer().domElement().style.opacity = "1";
+          land(next);
+          return;
+        }
+
+        const from = current;
+        const doorway = lookYaw ?? linkYaw(from.data.id, id);
+
+        // Autorotate and dragging would both fight the walk for the view, so
+        // they're held off until it has come to rest.
+        viewer.stopMovement();
+        viewer.setIdleMovement(Infinity);
+        viewer.controls().disable();
+
+        walkRef.current = walkToScene({
+          from,
+          to: next,
+          // Through a doorway: turn to it, and arrive still facing the way you
+          // walked — that's what makes it read as one continuous walk rather
+          // than a cut. With no doorway between the two (a jump from the rail
+          // or the plan), walk straight ahead and land on the scene's own view.
+          lookYaw: doorway,
+          arrivalYaw: doorway == null ? null : carryYaw(from.data.id, id, doorway),
+          fx: [walkBlurRef.current, walkShadeRef.current],
+          onSwitch: () => land(next),
+          onComplete: () => {
+            walkRef.current = null;
+            viewer.controls().enable();
+            if (autorotatingRef.current) {
+              viewer.setIdleMovement(3000, autorotateRef.current);
+            }
+          },
+        });
       };
 
       switchSceneRef.current(FIRST_SCENE, { instant: true });
@@ -97,6 +163,9 @@ export default function PanoViewer() {
 
     return () => {
       disposed = true;
+      // A walk still running would go on posing views that no longer exist.
+      walkRef.current?.kill();
+      walkRef.current = null;
       // Destroying the viewer tears down its canvas, its listeners and every
       // scene built on it in one go.
       viewerRef.current?.destroy();
@@ -109,7 +178,8 @@ export default function PanoViewer() {
   useEffect(() => {
     autorotatingRef.current = autorotating;
     const viewer = viewerRef.current;
-    if (!viewer || !autorotateRef.current) return;
+    // Mid-walk the ref is all that changes; the walk's own finish reads it.
+    if (!viewer || !autorotateRef.current || walkRef.current) return;
 
     if (autorotating) {
       viewer.startMovement(autorotateRef.current);
@@ -120,7 +190,7 @@ export default function PanoViewer() {
     }
   }, [autorotating]);
 
-  const goToScene = (id) => switchSceneRef.current?.(id);
+  const goToScene = (id, lookYaw) => switchSceneRef.current?.(id, { lookYaw });
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-panel-deep">
@@ -132,12 +202,20 @@ export default function PanoViewer() {
         createPortal(
           <CustomHotspot
             label={sceneName(slot.target)}
-            onSelect={() => goToScene(slot.target)}
+            onSelect={() => goToScene(slot.target, slot.yaw)}
           />,
           slot.element,
           slot.key
         )
       )}
+
+      {/* Motion blur toward the edges and a closing vignette while walking
+          between scenes. Siblings, each faded on its own: an opacity on a
+          shared parent would cut the blur off from the panorama behind it. */}
+      <div className="pointer-events-none absolute inset-0">
+        <div ref={walkBlurRef} className="walk-blur" />
+        <div ref={walkShadeRef} className="walk-shade" />
+      </div>
 
       {/* Sits above the stage but below the controls, so the buttons and
           labels on the top and bottom edges always have something to read

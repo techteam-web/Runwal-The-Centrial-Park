@@ -169,8 +169,8 @@ export const tourData = {   // <-- was: var APP_DATA =
       },
       "linkHotspots": [
         {
-          "yaw": -2.505719780731601,
-          "pitch": 0.04276536107555984,
+          "yaw": 1.6587005001818982,
+          "pitch": -0.1021195851628427,
           "rotation": 0,
           "target": "5-master-bedroom-02"
         }
