@@ -280,3 +280,300 @@ img {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* ============================================================
+   Mini map — the floor plan pinned bottom-left of the viewer.
+
+   The plan is shown exactly as drawn, white paper and all; the
+   gold lives only on what's interactive — the markers and the
+   radar — so those are the first thing the eye lands on.
+
+   The frame is laid out at the size it reaches on hover and
+   scaled *down* to rest. Growing it the other way round would
+   mean the browser rasterising the plan at ~260px and then
+   upscaling that bitmap, which turns the room labels to mush
+   the moment it opens. The outer .minimap keeps the resting
+   footprint, so the scale never disturbs the row it sits in.
+   ============================================================ */
+.minimap {
+  --mm-w: 232px;      /* footprint — what the layout reserves */
+  --mm-scale: 0.6;    /* resting scale; 1 / this is the zoom on hover */
+  --mm-footer: 30px;  /* the caption strip, in the frame's own units */
+  position: relative;
+  z-index: 1;
+  width: var(--mm-w);
+  height: calc(
+    var(--mm-w) / var(--mm-aspect) + var(--mm-footer) * var(--mm-scale)
+  );
+}
+
+/* A tablet gives the scene rail barely enough width as it is, so the plan
+   only takes its full footprint once there's a desktop to take it from. */
+@media (min-width: 1024px) {
+  .minimap {
+    --mm-w: 268px;
+  }
+}
+
+/* Zoomed, the plan reaches over the scene rail — it has to land on top of it
+   rather than behind, or half the markers open underneath a chip. */
+.minimap:hover,
+.minimap:has(:focus-visible) {
+  z-index: 30;
+}
+
+.minimap-frame {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--mm-w) / var(--mm-scale));
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 168, 103, 0.55);
+  background: var(--color-panel-deep);
+  transform: scale(var(--mm-scale));
+  transform-origin: bottom left;
+  box-shadow: 0 18px 44px -18px rgba(0, 0, 0, 0.9);
+  transition:
+    transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 520ms ease,
+    box-shadow 520ms ease;
+}
+
+/* Keyboard focus opens the map as well as hover — otherwise tabbing would
+   move focus into markers the visitor can barely see. Deliberately
+   :has(:focus-visible) and not :focus-within: the latter keeps the map
+   pinned open after a mouse click, because the marker keeps focus. */
+.minimap:hover .minimap-frame,
+.minimap:has(:focus-visible) .minimap-frame {
+  transform: scale(1);
+  border-color: rgba(201, 168, 103, 0.85);
+  box-shadow:
+    0 26px 70px -22px rgba(0, 0, 0, 0.95),
+    0 0 30px -10px rgba(201, 168, 103, 0.45);
+}
+
+/* The window onto the plan. Its own box, separate from the caption strip,
+   because it's this edge — not the frame's — that does the cropping. */
+.minimap-viewport {
+  position: relative;
+  aspect-ratio: var(--mm-aspect);
+  overflow: hidden; /* this is what crops the plan's white margin away */
+  background: #fefefe; /* the plan's own paper, so the crop has no seam */
+}
+
+/* The inner hairline — the double edge the reference frame has. */
+.minimap-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(170, 138, 75, 0.3);
+  border-radius: 11px 11px 6px 6px;
+  pointer-events: none;
+}
+
+.minimap-plane {
+  position: absolute;
+}
+
+.minimap-plan {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.minimap-points {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- the radar cone ---- */
+
+/* Multiplied into the plan rather than laid over it: the gold tints the white
+   paper, and the walls it crosses stay black instead of being washed toward
+   gold. */
+.minimap-radar {
+  position: absolute;
+  width: 164px;
+  height: 164px;
+  margin-left: -82px;
+  margin-top: -82px;
+  overflow: visible;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 0 6px rgba(201, 168, 103, 0.55));
+}
+
+/* ---- the markers ---- */
+.minimap-point {
+  position: absolute;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Gold with a white ring: the ring is what keeps a marker readable where it
+   lands on a black wall line, the gold where it lands on white paper. */
+.minimap-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  background: var(--color-gold);
+  box-shadow:
+    0 0 0 1px rgba(170, 138, 75, 0.7),
+    0 1px 3px rgba(10, 7, 4, 0.35);
+  transition:
+    width 260ms ease,
+    height 260ms ease,
+    background-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.minimap-point:hover .minimap-dot,
+.minimap-point:focus-visible .minimap-dot {
+  background: var(--color-gold-deep);
+  box-shadow:
+    0 0 0 1px rgba(170, 138, 75, 0.9),
+    0 0 12px 2px rgba(201, 168, 103, 0.75);
+}
+
+.minimap-point[data-active="true"] .minimap-dot {
+  width: 14px;
+  height: 14px;
+  background: var(--color-gold-deep);
+  box-shadow:
+    0 0 0 1px rgba(170, 138, 75, 0.95),
+    0 0 14px 3px rgba(201, 168, 103, 0.85);
+}
+
+/* The live marker breathes, on the same pulse as the hotspots in the
+   panorama, so it reads as "you are here" rather than just a bigger dot. */
+.minimap-point::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid rgba(201, 168, 103, 0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.minimap-point[data-active="true"]::before {
+  animation: hotspot-pulse 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.minimap-point:focus-visible {
+  outline: none;
+}
+
+/* The marker's name. Collapsed until the marker itself is hovered, and hung
+   below or to one side for the markers that sit against a frame edge — the
+   frame clips, so a name that always went straight up would be cut off for
+   the utility and the servant's room. */
+.minimap-tip {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  border: 1px solid rgba(201, 168, 103, 0.45);
+  background: rgba(10, 7, 4, 0.92);
+  color: var(--color-cream);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.minimap-tip[data-below="true"] {
+  bottom: auto;
+  top: calc(100% - 2px);
+}
+
+.minimap-tip[data-align="center"] {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.minimap-tip[data-align="start"] {
+  left: 2px;
+}
+
+.minimap-tip[data-align="end"] {
+  right: 2px;
+}
+
+.minimap-point:hover .minimap-tip,
+.minimap-point:focus-visible .minimap-tip {
+  opacity: 1;
+}
+
+/* ---- the caption strip ---- */
+
+/* Its own strip below the plan rather than printed over it: on white paper
+   the label would need a backing, and a backing along the bottom edge would
+   sit right on top of the balcony markers. */
+.minimap-caption {
+  display: flex;
+  height: var(--mm-footer);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border-top: 1px solid rgba(201, 168, 103, 0.3);
+  color: rgba(243, 234, 217, 0.85);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Counter-scaled against the frame so the label holds one size on screen —
+   it isn't part of the drawing, and would otherwise shrink to about 6px at
+   rest. */
+.minimap-caption-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: scale(calc(1 / var(--mm-scale)));
+  transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.minimap:hover .minimap-caption-label,
+.minimap:has(:focus-visible) .minimap-caption-label {
+  transform: scale(1);
+}
+
+.minimap-caption-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 8px 1px rgba(201, 168, 103, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minimap-frame,
+  .minimap-caption-label {
+    transition: none;
+  }
+
+  .minimap-point[data-active="true"]::before {
+    animation: none;
+  }
+}

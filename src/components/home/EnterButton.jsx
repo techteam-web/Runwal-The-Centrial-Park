@@ -15,7 +15,7 @@ export default function EnterButton() {
       onClick={() => coverAndNavigate("/tour")}
       className="shine-btn group inline-flex items-center gap-4 rounded-full border border-sand/35 bg-forest-deep/50 px-9 py-4 font-body text-sm tracking-[0.18em] text-sand uppercase hover:border-sand/70 hover:bg-forest-deep/80 hover:text-sand-light focus-visible:outline-none lg:gap-3 lg:px-6 lg:py-3.5 lg:text-[11px] lg:tracking-[0.14em]"
     >
-      <span>Enter The Virtual Tour</span>
+      <span>View 4.5 BHK</span>
 
       {/* The arrow nudges forward on hover — a small second motion so the
           button doesn't rely on the border glow alone. */}

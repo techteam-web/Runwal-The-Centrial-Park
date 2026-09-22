@@ -6,6 +6,7 @@ import { tourData } from "@/lib/tourData";
 import { createAutorotate, createScenes, sceneName } from "@/lib/marzipano-helpers";
 import CustomHotspot from "./CustomHotspot";
 import SceneSwitcher from "./SceneSwitcher";
+import MiniMap from "./MiniMap";
 import AutorotateToggle from "./AutorotateToggle";
 import CloseButton from "./CloseButton";
 
@@ -22,6 +23,10 @@ export default function PanoViewer() {
     tourData.settings.autorotateEnabled
   );
   const [ready, setReady] = useState(false);
+  // The viewer itself, in state as well as in a ref: the mini map's radar
+  // subscribes to viewChange, and a ref alone would never tell it that the
+  // viewer had finished being built.
+  const [viewer, setViewer] = useState(null);
   // One wrapper <div> per hotspot of the current scene. Marzipano positions
   // these itself; we portal React into them so the hotspots stay real
   // components instead of hand-built DOM.
@@ -47,6 +52,7 @@ export default function PanoViewer() {
         controls: { mouseViewMode: tourData.settings.mouseViewMode },
       });
       viewerRef.current = viewer;
+      setViewer(viewer);
 
       const built = createScenes(Marzipano, viewer);
       scenesRef.current = built;
@@ -95,6 +101,7 @@ export default function PanoViewer() {
       // scene built on it in one go.
       viewerRef.current?.destroy();
       viewerRef.current = null;
+      setViewer(null);
     };
   }, []);
 
@@ -157,7 +164,15 @@ export default function PanoViewer() {
           </div>
         </div>
 
-        <SceneSwitcher currentId={currentId} onSelect={goToScene} />
+        {/* One row along the bottom edge: the plan holds the left corner and
+            the scene rail centres itself in whatever width is left. */}
+        <div className="flex items-end gap-4 sm:gap-5">
+          <MiniMap viewer={viewer} currentId={currentId} onSelect={goToScene} />
+
+          <div className="min-w-0 flex-1 lg:pr-36">
+            <SceneSwitcher currentId={currentId} onSelect={goToScene} />
+          </div>
+        </div>
       </div>
 
       {/* Covers the first tile fetch. Fades out rather than unmounting so it
