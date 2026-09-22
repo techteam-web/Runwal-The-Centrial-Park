@@ -3,14 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { tourData } from "@/lib/tourData";
-import {
-  carryYaw,
-  createAutorotate,
-  createScenes,
-  linkYaw,
-  sceneName,
-} from "@/lib/marzipano-helpers";
-import { walkToScene } from "@/lib/walkTransition";
+import { createAutorotate, createScenes, sceneName } from "@/lib/marzipano-helpers";
+import { zoomToScene } from "@/lib/zoomTransition";
 import CustomHotspot from "./CustomHotspot";
 import SceneSwitcher from "./SceneSwitcher";
 import MiniMap from "./MiniMap";
@@ -24,12 +18,11 @@ export default function PanoViewer() {
   const viewerRef = useRef(null);
   const scenesRef = useRef(null);
   const autorotateRef = useRef(null);
-  // The two overlays that ride along with a walk between scenes.
-  const walkBlurRef = useRef(null);
-  const walkShadeRef = useRef(null);
-  // The walk in progress, if any. Doubles as the lock: a second request made
-  // mid-walk is dropped rather than wrenching the view off in a new direction.
-  const walkRef = useRef(null);
+  // The frozen frame of the room being left, zoomed during a scene change.
+  const zoomCanvasRef = useRef(null);
+  // The zoom in progress, if any. Doubles as the lock: a second request made
+  // mid-zoom is dropped rather than cutting the first one off halfway.
+  const zoomRef = useRef(null);
 
   const [currentId, setCurrentId] = useState(FIRST_SCENE);
   const [autorotating, setAutorotating] = useState(
@@ -93,7 +86,7 @@ export default function PanoViewer() {
           return {
             element,
             target: spot.target,
-            yaw: spot.yaw,
+            focus: { yaw: spot.yaw, pitch: spot.pitch },
             key: `${next.data.id}-${spot.target}-${spot.yaw}`,
           };
         });
@@ -101,11 +94,11 @@ export default function PanoViewer() {
       };
 
       // Switching is defined in here so it closes over the built scenes.
-      // `lookYaw` is the doorway to walk through — a clicked hotspot passes
-      // its own; the scene rail and the mini map leave it to be looked up.
-      switchSceneRef.current = (id, { instant = false, lookYaw } = {}) => {
+      // `focus` is the { yaw, pitch } to zoom into — a clicked hotspot passes
+      // its own; the scene rail and the mini map zoom into the middle.
+      switchSceneRef.current = (id, { instant = false, focus } = {}) => {
         const next = built.find((entry) => entry.data.id === id);
-        if (!next || next === current || walkRef.current) return;
+        if (!next || next === current || zoomRef.current) return;
 
         const still =
           instant ||
@@ -113,36 +106,29 @@ export default function PanoViewer() {
           window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         if (still) {
-          next.view.setParameters({ ...next.data.initialViewParameters, roll: 0 });
+          next.view.setParameters(next.data.initialViewParameters);
           next.scene.switchTo({ transitionDuration: instant ? 0 : 900 });
-          // A walk leaves the container it walked away from faded out.
+          // A zoom leaves the container it zoomed away from faded out.
           next.scene.hotspotContainer().domElement().style.opacity = "1";
           land(next);
           return;
         }
 
-        const from = current;
-        const doorway = lookYaw ?? linkYaw(from.data.id, id);
-
-        // Autorotate and dragging would both fight the walk for the view, so
-        // they're held off until it has come to rest.
+        // Autorotate and dragging would both pull the view out from under
+        // the zoom, so they're held off until it has come to rest.
         viewer.stopMovement();
         viewer.setIdleMovement(Infinity);
         viewer.controls().disable();
 
-        walkRef.current = walkToScene({
-          from,
+        zoomRef.current = zoomToScene({
+          viewer,
+          overlay: zoomCanvasRef.current,
+          from: current,
           to: next,
-          // Through a doorway: turn to it, and arrive still facing the way you
-          // walked — that's what makes it read as one continuous walk rather
-          // than a cut. With no doorway between the two (a jump from the rail
-          // or the plan), walk straight ahead and land on the scene's own view.
-          lookYaw: doorway,
-          arrivalYaw: doorway == null ? null : carryYaw(from.data.id, id, doorway),
-          fx: [walkBlurRef.current, walkShadeRef.current],
+          focus,
           onSwitch: () => land(next),
           onComplete: () => {
-            walkRef.current = null;
+            zoomRef.current = null;
             viewer.controls().enable();
             if (autorotatingRef.current) {
               viewer.setIdleMovement(3000, autorotateRef.current);
@@ -163,9 +149,9 @@ export default function PanoViewer() {
 
     return () => {
       disposed = true;
-      // A walk still running would go on posing views that no longer exist.
-      walkRef.current?.kill();
-      walkRef.current = null;
+      // A zoom still running would go on posing views that no longer exist.
+      zoomRef.current?.kill();
+      zoomRef.current = null;
       // Destroying the viewer tears down its canvas, its listeners and every
       // scene built on it in one go.
       viewerRef.current?.destroy();
@@ -178,8 +164,8 @@ export default function PanoViewer() {
   useEffect(() => {
     autorotatingRef.current = autorotating;
     const viewer = viewerRef.current;
-    // Mid-walk the ref is all that changes; the walk's own finish reads it.
-    if (!viewer || !autorotateRef.current || walkRef.current) return;
+    // Mid-zoom the ref is all that changes; the zoom's own finish reads it.
+    if (!viewer || !autorotateRef.current || zoomRef.current) return;
 
     if (autorotating) {
       viewer.startMovement(autorotateRef.current);
@@ -190,32 +176,33 @@ export default function PanoViewer() {
     }
   }, [autorotating]);
 
-  const goToScene = (id, lookYaw) => switchSceneRef.current?.(id, { lookYaw });
+  const goToScene = (id, focus) => switchSceneRef.current?.(id, { focus });
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-panel-deep">
       {/* Marzipano owns everything inside this node. */}
       <div ref={stageRef} className="absolute inset-0" />
 
+      {/* Over the stage and its hotspots, under the controls. Opacity is set
+          inline rather than with a class so GSAP's writes simply replace it. */}
+      <canvas
+        ref={zoomCanvasRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        style={{ opacity: 0 }}
+      />
+
       {/* Each hotspot is rendered into the wrapper Marzipano is positioning. */}
       {hotspotSlots.map((slot) =>
         createPortal(
           <CustomHotspot
             label={sceneName(slot.target)}
-            onSelect={() => goToScene(slot.target, slot.yaw)}
+            onSelect={() => goToScene(slot.target, slot.focus)}
           />,
           slot.element,
           slot.key
         )
       )}
-
-      {/* Motion blur toward the edges and a closing vignette while walking
-          between scenes. Siblings, each faded on its own: an opacity on a
-          shared parent would cut the blur off from the panorama behind it. */}
-      <div className="pointer-events-none absolute inset-0">
-        <div ref={walkBlurRef} className="walk-blur" />
-        <div ref={walkShadeRef} className="walk-shade" />
-      </div>
 
       {/* Sits above the stage but below the controls, so the buttons and
           labels on the top and bottom edges always have something to read

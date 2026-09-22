@@ -80,7 +80,7 @@ export default function Hero({ revealed }) {
         <div ref={copyRef}>
           <div className="mt-8 h-px w-14 bg-mint/60" />
 
-          <h1 className="mt-6 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[2.6rem] xl:text-[3rem]">
+          <h1 className="mt-6 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[2.6rem] xl:text-[3rem] pointer-events-none">
             Runwal
             <br />
             The Central Park
@@ -88,12 +88,12 @@ export default function Hero({ revealed }) {
 
           {/* The long copy would crowd a 26% column, so it's for phones and
               tablets only — the desktop gets the photograph instead. */}
-          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75 lg:hidden">
+          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75 lg:hidden pointer-events-none">
             Step inside every room in full 360°. Move between the living spaces,
             the bedrooms and the balconies exactly as you would on a site visit.
           </p>
 
-          <p className="mt-5 hidden font-body text-sm leading-relaxed text-sand/75 lg:block">
+          <p className="mt-5 hidden font-body text-sm leading-relaxed text-sand/75 lg:block pointer-events-none">
             Step inside every room in full 360°.
           </p>
 
@@ -101,7 +101,7 @@ export default function Hero({ revealed }) {
             <EnterButton />
           </div>
 
-          <p className="mt-8 font-body text-[10px] tracking-[0.28em] text-mint/60 uppercase">
+          <p className="mt-8 font-body text-[10px] tracking-[0.28em] text-mint/60 uppercase pointer-events-none">
             17 Spaces · 360° Walkthrough
           </p>
         </div>
