@@ -100,8 +100,9 @@ export function zoomToScene({ viewer, overlay, from, to, focus, onSwitch, onComp
     gsap
       .timeline({ onComplete: finish })
       // The push accelerates all the way through the fade, so the hand-off
-      // happens mid-motion rather than from a standstill.
-      .to(overlay, { scale: PUSH, duration: FADE_AT + FADE, ease: "power2.in" }, 0)
+      // happens mid-motion rather than from a standstill. Quadratic rather
+      // than steeper, so the click gets visible movement straight away.
+      .to(overlay, { scale: PUSH, duration: FADE_AT + FADE, ease: "power1.in" }, 0)
       .to(overlay, { opacity: 0, duration: FADE, ease: "power1.inOut" }, FADE_AT)
       .to(
         state,
