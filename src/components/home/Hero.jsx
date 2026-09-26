@@ -111,7 +111,7 @@ export default function Hero({ revealed }) {
           </div>
 
           <p className="pointer-events-none mt-8 font-body text-[11px] tracking-[0.28em] text-mint/60 uppercase sm:mt-10 sm:text-xs">
-             360° Walkthrough
+           Virtual Walkthrough
           </p>
         </div>
       </section>
