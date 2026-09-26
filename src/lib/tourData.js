@@ -4,6 +4,50 @@
 export const tourData = {   // <-- was: var APP_DATA =
   "scenes": [
     {
+      "id": "17-foyer",
+      "name": "Foyer",
+      "levels": [
+        {
+          "tileSize": 256,
+          "size": 256,
+          "fallbackOnly": true
+        },
+        {
+          "tileSize": 512,
+          "size": 512
+        },
+        {
+          "tileSize": 512,
+          "size": 1024
+        },
+        {
+          "tileSize": 512,
+          "size": 2048
+        }
+      ],
+      "faceSize": 2000,
+      "initialViewParameters": {
+        "pitch": 0,
+        "yaw": 0,
+        "fov": 1.5707963267948966
+      },
+      "linkHotspots": [
+        {
+          "yaw": 0.5235987755982988,
+          "pitch": 0.38,
+          "rotation": 0,
+          "target": "0-living-cam_2"
+        },
+        {
+          "yaw": 0.41592653589793,
+          "pitch": 0.02,
+          "rotation": 0,
+          "target": "15-living-balcony"
+        }
+      ],
+      "infoHotspots": []
+    },
+    {
       "id": "0-living-cam_2",
       "name": "living cam_2",
       "levels": [
@@ -79,6 +123,12 @@ export const tourData = {   // <-- was: var APP_DATA =
           "pitch": 0.3170025924486435,
           "rotation": 0,
           "target": "11-guest-washroom_2"
+        },
+        {
+          "yaw": -2.5866190845660673,
+          "pitch": 0.3,
+          "rotation": 0,
+          "target": "17-foyer"
         }
       ],
       "infoHotspots": []
@@ -721,6 +771,12 @@ export const tourData = {   // <-- was: var APP_DATA =
           "pitch": 0.13282491483369618,
           "rotation": 0,
           "target": "14-kitchen"
+        },
+        {
+          "yaw": -2.9372099184048768,
+          "pitch": 0.14,
+          "rotation": 0,
+          "target": "17-foyer"
         }
       ],
       "infoHotspots": []

@@ -47,24 +47,22 @@ export default function Hero({ revealed }) {
           that hide it. */}
       <div className="hero-photo absolute inset-0 -z-10 hidden lg:block" />
 
-      {/* Carries the panel's teal a little way across the photo so the column
-          doesn't end in a hard vertical cut against the sky. */}
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 hidden lg:block"
-        style={{
-          background:
-            "linear-gradient(to right, rgba(6,56,47,0.92) 0%, rgba(6,56,47,0.45) 10%, rgba(6,56,47,0.12) 24%, transparent 42%)",
-        }}
-      />
-
-      {/* ---- the teal column: a narrow 26% on desktop, the whole screen on
-           phones. flex-1 is what makes it fill a short mobile viewport. ---- */}
+      {/* ---- the teal column: about a third of a desktop, the whole screen
+           on phones. The percentage is what keeps it in proportion on a wide
+           monitor; the min and max stop it turning into a slot on a small
+           laptop or a half-page slab on an ultrawide. flex-1 is what makes it
+           fill a short mobile viewport. ---- */}
       <section
         data-hero-panel
-        className="panel-gradient relative flex w-full flex-1 flex-col justify-center px-8 py-20 sm:px-14 lg:w-[26%] lg:min-w-90 lg:flex-none lg:px-9 xl:px-12"
+        className="panel-gradient @container relative flex w-full flex-1 flex-col justify-center px-8 py-20 sm:px-14 sm:py-24 lg:w-[32%] lg:max-w-[600px] lg:min-w-[440px] lg:flex-none lg:px-10 lg:py-16 xl:px-12 2xl:px-14"
       >
         {/* A hairline down the seam where the column meets the photo. */}
         <div className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-mint/45 to-transparent lg:block" />
+
+        {/* Carries the panel's teal a little way across the photo so the column
+            doesn't end in a hard vertical cut against the sky. It hangs off the
+            panel's own right edge, so it follows the column at every width. */}
+        <div className="pointer-events-none absolute inset-y-0 left-full hidden w-[45%] bg-gradient-to-r from-forest-deep/85 via-forest-deep/25 to-transparent lg:block" />
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -74,13 +72,13 @@ export default function Hero({ revealed }) {
           alt="Runwal The Central Park"
           width={72}
           height={93}
-          className="opacity-0"
+          className="h-auto w-[68px] opacity-0 sm:w-20 lg:w-[84px] xl:w-[92px]"
         />
 
         <div ref={copyRef}>
-          <div className="mt-8 h-px w-14 bg-mint/60" />
+          <div className="mt-8 h-px w-16 bg-mint/60 lg:w-20" />
 
-          <h1 className="mt-6 font-display text-4xl leading-[1.12] text-sand-light sm:text-5xl lg:text-[2.6rem] xl:text-[3rem] pointer-events-none">
+          <h1 className="pointer-events-none mt-6 font-display text-[clamp(2.05rem,12.5cqw,4rem)] leading-[1.1] text-sand-light">
             Runwal
             <br />
             The Central Park
@@ -88,12 +86,12 @@ export default function Hero({ revealed }) {
 
           {/* The long copy would crowd a 26% column, so it's for phones and
               tablets only — the desktop gets the photograph instead. */}
-          <p className="mt-6 max-w-md font-body text-base leading-relaxed text-sand/75 lg:hidden pointer-events-none">
+          <p className="pointer-events-none mt-6 max-w-lg font-body text-base leading-relaxed text-sand/75 sm:text-lg lg:hidden">
             Step inside every room in full 360°. Move between the living spaces,
             the bedrooms and the balconies exactly as you would on a site visit.
           </p>
 
-          <p className="mt-5 hidden font-body text-sm leading-relaxed text-sand/75 lg:block pointer-events-none">
+          <p className="pointer-events-none mt-5 hidden font-body text-[0.95rem] leading-relaxed text-sand/75 lg:block xl:mt-6 xl:text-base">
             Step inside every room in full 360°.
           </p>
 
@@ -103,7 +101,7 @@ export default function Hero({ revealed }) {
 
               "View" is for screen readers only: with it showing, a pair of
               these is ~340px wide, and the desktop column has 264px at 1280. */}
-          <div className="mt-9 grid w-fit grid-cols-2 gap-2.5 sm:gap-3">
+          <div className="mt-9 grid w-full max-w-[420px] grid-cols-2 gap-3 sm:mt-10 sm:gap-4 lg:max-w-[460px]">
             <EnterButton href="/tour/3-bhk">
               <span className="sr-only">View </span>3 BHK
             </EnterButton>
@@ -112,8 +110,8 @@ export default function Hero({ revealed }) {
             </EnterButton>
           </div>
 
-          <p className="mt-8 font-body text-[10px] tracking-[0.28em] text-mint/60 uppercase pointer-events-none">
-            17 Spaces · 360° Walkthrough
+          <p className="pointer-events-none mt-8 font-body text-[11px] tracking-[0.28em] text-mint/60 uppercase sm:mt-10 sm:text-xs">
+             360° Walkthrough
           </p>
         </div>
       </section>

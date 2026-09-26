@@ -88,6 +88,7 @@ export const minimap45 = buildMinimap({
     { id: "14-kitchen", x: 39.24, y: 37.16, north: 138 },
     { id: "15-living-balcony", x: 53.65, y: 76.97, north: 177 },
     { id: "16-guest_room", x: 69.08, y: 57.35, north: 108 },
+    { id: "17-foyer", x: 59.69, y: 28.06, north: 168 },
   ],
 });
 

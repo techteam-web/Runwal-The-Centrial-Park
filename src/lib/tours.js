@@ -27,7 +27,9 @@ export const TOURS = {
     label: "4.5 BHK",
     data: tourData,
     tiles: "/tour/tiles",
-    firstScene: "0-living-cam_2",
+    // The entrance foyer, looking down into the living room — the same
+    // "walk in through the front door" opening as the 3 BHK.
+    firstScene: "17-foyer",
     minimap: minimap45,
   },
 };
